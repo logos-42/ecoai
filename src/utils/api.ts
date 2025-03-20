@@ -25,7 +25,7 @@ export async function sendChatMessage(message: string): Promise<ApiResponse<Mess
         messages: [
           {
             role: 'system',
-            content: '你是一个专业的经济学助手，擅长解释经济学概念、分析经济政策影响并提供相关洞见。你的回答应该简洁、清晰，并尽可能提供实际例子来帮助用户理解。请使用中文回答所有问题。'
+            content: '你是一个专业的经济学助手，擅长解释经济学概念、分析经济政策影响并提供相关洞见。你的回答应该简洁、清晰，并尽可能提供实际例子来帮助用户理解。请使用中文回答所有问题。尽量使用Markdown格式来组织你的回答，包括使用标题、列表、强调和引用等格式。'
           },
           {
             role: 'user',
@@ -281,50 +281,200 @@ export async function generateVisualization(type: string, params: Record<string,
   try {
     console.log('Generating visualization with params:', params);
     
-    // Simulate API response with a supply-demand curve
-    const response: VisualizationData = {
-      type: 'supply-demand',
-      title: '供需曲线',
-      xAxis: {
-        title: '数量',
-        data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-      },
-      yAxis: {
-        title: '价格',
-        data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-      },
-      series: [
-        {
-          name: '供给',
-          data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-          type: 'line',
-        },
-        {
-          name: '需求',
-          data: [11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
-          type: 'line',
-        },
-      ],
-    };
+    // Build a prompt based on visualization type
+    let prompt = '';
+    switch(type) {
+      case 'supply-demand':
+        prompt = '请生成一个2020年到2030年的供需曲线预测数据，包括价格和数量的关系。';
+        break;
+      case 'gdp-growth':
+        prompt = '请生成一个2020年到2030年间中国GDP增长率的预测数据。提供每年的GDP增长率预测值。';
+        break;
+      case 'inflation':
+        prompt = '请生成一个2020年到2030年间的通货膨胀率预测数据。提供每年的通货膨胀率预测值。';
+        break;
+      case 'unemployment':
+        prompt = '请生成一个2020年到2030年间的失业率预测数据。提供每年的失业率预测值。';
+        break;
+      default:
+        prompt = `请生成一个2020年到2030年间的${type}经济数据预测。`;
+    }
     
-    return { data: response };
+    prompt += ' 请用JSON格式返回数据，包含年份和对应的数值。';
+    
+    // Call DeepSeek API for chart data
+    const response = await fetch(`${API_ENDPOINT}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          {
+            role: 'system',
+            content: '你是一个专业的经济数据分析师，擅长生成经济预测数据。请按照要求生成相应的数据集。所有返回必须是有效的JSON格式，不要有任何多余的说明文字。'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.3, // Lower temperature for more consistent outputs
+        max_tokens: 1000,
+      }),
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      console.error('DeepSeek API error:', data);
+      throw new Error(data.error?.message || '请求API时出错');
+    }
+    
+    const aiResponse = data.choices[0].message.content;
+    
+    // Try to extract JSON from the response
+    const jsonMatch = aiResponse.match(/```json\n([\s\S]*?)\n```/) || aiResponse.match(/```\n([\s\S]*?)\n```/) || aiResponse.match(/\{[\s\S]*\}/);
+    
+    let chartData;
+    try {
+      chartData = jsonMatch 
+        ? JSON.parse(jsonMatch[1] || jsonMatch[0]) 
+        : JSON.parse(aiResponse);
+    } catch (error) {
+      console.error('Failed to parse JSON from API response:', error);
+      console.log('Raw response:', aiResponse);
+      throw new Error('无法解析可视化数据');
+    }
+    
+    // Process the data based on visualization type
+    let visualizationData: VisualizationData;
+    
+    switch(type) {
+      case 'supply-demand':
+        visualizationData = processSupplyDemandData(chartData);
+        break;
+      case 'gdp-growth':
+        visualizationData = processTimeSeriesData(chartData, 'GDP增长率', '%');
+        break;
+      case 'inflation':
+        visualizationData = processTimeSeriesData(chartData, '通货膨胀率', '%');
+        break;
+      case 'unemployment':
+        visualizationData = processTimeSeriesData(chartData, '失业率', '%');
+        break;
+      default:
+        visualizationData = processTimeSeriesData(chartData, type, '');
+    }
+    
+    return { data: visualizationData };
   } catch (error) {
     console.error('Error generating visualization:', error);
     return { 
       data: {
-        type: 'custom',
-        title: '可视化错误',
+        type: 'error',
+        title: '可视化生成失败',
         xAxis: {
-          title: '',
-          data: [],
+          title: '年份',
+          data: ['2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030'],
         },
         yAxis: {
-          title: '',
+          title: '数值',
           data: [],
         },
-        series: [],
+        series: [{
+          name: '错误',
+          data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          type: 'line',
+        }],
       }, 
       error: error instanceof Error ? error.message : '未知错误' 
     };
   }
+}
+
+// Helper functions to process visualization data
+function processSupplyDemandData(data: any): VisualizationData {
+  // Handle supply-demand curve data
+  const years = Object.keys(data).sort() || ['2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030'];
+  
+  // Extract supply and demand data
+  const supplyData = years.map(year => data[year]?.supply || 0);
+  const demandData = years.map(year => data[year]?.demand || 0);
+  
+  return {
+    type: 'supply-demand',
+    title: '2020-2030供需曲线预测',
+    xAxis: {
+      title: '年份',
+      data: years,
+    },
+    yAxis: {
+      title: '数量',
+      data: [],
+    },
+    series: [
+      {
+        name: '供给',
+        data: supplyData,
+        type: 'line',
+      },
+      {
+        name: '需求',
+        data: demandData,
+        type: 'line',
+      },
+    ],
+  };
+}
+
+function processTimeSeriesData(data: any, title: string, unit: string): VisualizationData {
+  let years: string[] = [];
+  let values: number[] = [];
+  
+  // Handle different possible data formats
+  if (Array.isArray(data)) {
+    // If data is an array of objects with year/value properties
+    data.forEach((item: any) => {
+      if (item.year && (item.value !== undefined || item.rate !== undefined)) {
+        years.push(item.year.toString());
+        values.push(Number(item.value || item.rate || 0));
+      }
+    });
+  } else if (typeof data === 'object') {
+    // If data is an object with years as keys
+    years = Object.keys(data).sort();
+    values = years.map(year => {
+      const value = data[year];
+      return typeof value === 'object' ? Number(value.value || value.rate || 0) : Number(value || 0);
+    });
+  }
+  
+  // Default to 2020-2030 if no valid data was extracted
+  if (years.length === 0) {
+    years = ['2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030'];
+    values = [3.2, 3.5, 3.8, 4.0, 4.2, 4.1, 3.9, 3.7, 3.5, 3.3, 3.0]; // Default example values
+  }
+  
+  return {
+    type: 'time-series',
+    title: `2020-2030${title}预测`,
+    xAxis: {
+      title: '年份',
+      data: years,
+    },
+    yAxis: {
+      title: `${title}(${unit})`,
+      data: [],
+    },
+    series: [
+      {
+        name: title,
+        data: values,
+        type: 'area',
+      },
+    ],
+  };
 }

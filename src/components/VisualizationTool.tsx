@@ -8,6 +8,7 @@ import { generateVisualization } from '../utils/api';
 import AnimatedTransition from './AnimatedTransition';
 import { toast } from '@/components/ui/use-toast';
 import type { EChartsOption } from 'echarts';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // We'll use a dynamic import for Charts to avoid SSR issues
 const EChartsReact = React.lazy(() => import('echarts-for-react'));
@@ -28,6 +29,7 @@ const VisualizationTool: React.FC<VisualizationToolProps> = ({ className }) => {
   const [visualization, setVisualization] = useState<VisualizationData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const chartRef = useRef<any>(null);
+  const isMobile = useIsMobile();
 
   const handleTypeChange = (value: string) => {
     setSelectedType(value);
@@ -70,6 +72,7 @@ const VisualizationTool: React.FC<VisualizationToolProps> = ({ className }) => {
         textStyle: {
           fontFamily: 'Inter, sans-serif',
           fontWeight: 500,
+          fontSize: isMobile ? 14 : 16
         }
       },
       tooltip: {
@@ -88,20 +91,26 @@ const VisualizationTool: React.FC<VisualizationToolProps> = ({ className }) => {
         bottom: 0,
         textStyle: {
           fontFamily: 'Inter, sans-serif',
-        }
+          fontSize: isMobile ? 12 : 14
+        },
+        itemWidth: isMobile ? 12 : 25,
+        itemHeight: isMobile ? 8 : 14
       },
       grid: {
-        left: '5%',
-        right: '5%',
-        bottom: '15%',
-        top: '15%',
+        left: isMobile ? '8%' : '5%',
+        right: isMobile ? '5%' : '5%',
+        bottom: isMobile ? '20%' : '15%',
+        top: isMobile ? '20%' : '15%',
         containLabel: true
       },
       xAxis: {
         type: 'category' as const,
         name: visualization.xAxis.title,
         nameLocation: 'middle',
-        nameGap: 30,
+        nameGap: isMobile ? 25 : 30,
+        nameTextStyle: {
+          fontSize: isMobile ? 12 : 14
+        },
         data: visualization.xAxis.data,
         axisLine: {
           lineStyle: {
@@ -110,13 +119,21 @@ const VisualizationTool: React.FC<VisualizationToolProps> = ({ className }) => {
         },
         axisTick: {
           alignWithLabel: true
+        },
+        axisLabel: {
+          fontSize: isMobile ? 10 : 12,
+          interval: isMobile ? 'auto' : 0,
+          rotate: isMobile ? 45 : 0
         }
       },
       yAxis: {
         type: 'value' as const,
         name: visualization.yAxis.title,
         nameLocation: 'middle',
-        nameGap: 40,
+        nameGap: isMobile ? 35 : 40,
+        nameTextStyle: {
+          fontSize: isMobile ? 12 : 14
+        },
         axisLine: {
           lineStyle: {
             color: '#E0E0E5'
@@ -126,6 +143,9 @@ const VisualizationTool: React.FC<VisualizationToolProps> = ({ className }) => {
           lineStyle: {
             color: '#F5F5F7'
           }
+        },
+        axisLabel: {
+          fontSize: isMobile ? 10 : 12
         }
       },
       series: visualization.series.map((series, index) => {
@@ -147,14 +167,19 @@ const VisualizationTool: React.FC<VisualizationToolProps> = ({ className }) => {
           data: series.data,
           smooth: true,
           // Add areaStyle for 'area' type
-          ...(series.type === 'area' ? { areaStyle: {} } : {}),
+          ...(series.type === 'area' ? { 
+            areaStyle: {
+              opacity: 0.3
+            } 
+          } : {}),
           lineStyle: {
-            width: 3,
+            width: isMobile ? 2 : 3,
             color: index === 0 ? '#0077CC' : '#FF6B6B'
           },
           itemStyle: {
             color: index === 0 ? '#0077CC' : '#FF6B6B'
-          }
+          },
+          symbolSize: isMobile ? 4 : 6
         };
       })
     };
@@ -162,15 +187,15 @@ const VisualizationTool: React.FC<VisualizationToolProps> = ({ className }) => {
 
   return (
     <div className={cn("flex flex-col h-full rounded-2xl overflow-hidden glass-card", className)}>
-      <div className="px-6 py-4 border-b">
-        <h2 className="text-xl font-semibold">经济数据可视化</h2>
-        <p className="text-sm text-muted-foreground">生成并探索经济图表</p>
+      <div className="px-4 md:px-6 py-3 md:py-4 border-b">
+        <h2 className="text-lg md:text-xl font-semibold">经济数据可视化</h2>
+        <p className="text-xs md:text-sm text-muted-foreground">生成并探索经济图表</p>
       </div>
       
-      <div className="p-6 space-y-6 flex-1">
-        <div className="flex items-center gap-4">
+      <div className="p-3 md:p-6 space-y-4 md:space-y-6 flex-1">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 md:gap-4">
           <Select value={selectedType} onValueChange={handleTypeChange}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-full sm:w-[200px]">
               <SelectValue placeholder="选择图表类型" />
             </SelectTrigger>
             <SelectContent>
@@ -182,7 +207,11 @@ const VisualizationTool: React.FC<VisualizationToolProps> = ({ className }) => {
             </SelectContent>
           </Select>
           
-          <Button onClick={handleGenerateChart} disabled={isLoading}>
+          <Button 
+            onClick={handleGenerateChart} 
+            disabled={isLoading}
+            className="w-full sm:w-auto"
+          >
             {isLoading ? (
               <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -198,23 +227,24 @@ const VisualizationTool: React.FC<VisualizationToolProps> = ({ className }) => {
               <EChartsReact
                 ref={chartRef}
                 option={getChartOptions()}
-                style={{ height: '100%', width: '100%', minHeight: '300px' }}
+                style={{ height: '100%', width: '100%', minHeight: isMobile ? '250px' : '300px' }}
                 className="w-full h-full"
+                opts={{ renderer: 'canvas' }}
               />
             </React.Suspense>
           )}
         </AnimatedTransition>
         
         {!visualization && (
-          <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-            <div className="w-16 h-16 mb-4 rounded-full bg-econoGray-light flex items-center justify-center">
+          <div className="flex-1 flex flex-col items-center justify-center text-center p-4 md:p-8">
+            <div className="w-12 h-12 md:w-16 md:h-16 mb-4 rounded-full bg-econoGray-light flex items-center justify-center">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M8 18L12 14M12 14L16 18M12 14V22M20.8 17.0399C22.1523 15.871 23 14.141 23 12.1941C23 8.73892 20.2822 5.99999 17 5.99999C16.7031 5.99999 16.4111 6.02305 16.1262 6.06756C15.1022 3.46489 12.7096 1.49999 10 1.49999C6.49746 1.49999 3.72836 4.29933 3.52442 7.90642C1.48693 8.91956 0 11.0254 0 13.5C0 17.0899 2.91015 20 6.5 20H7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <h3 className="text-lg font-medium mb-2">选择图表类型并生成</h3>
-            <p className="text-sm text-muted-foreground max-w-md">
-              选择您想要生成的经济数据图表类型，然后点击"生成图表"按钮。
+            <h3 className="text-base md:text-lg font-medium mb-2">选择图表类型并生成</h3>
+            <p className="text-xs md:text-sm text-muted-foreground max-w-md">
+              选择您想要生成的经济数据图表类型，然后点击"生成图表"按钮查看2020-2030年的预测数据。
             </p>
           </div>
         )}

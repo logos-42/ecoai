@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { sendChatMessage } from '../utils/api';
 import AnimatedTransition from './AnimatedTransition';
 import { toast } from '@/components/ui/use-toast';
+import Markdown from './Markdown';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ChatInterfaceProps {
   className?: string;
@@ -24,6 +26,41 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ className }) => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
+
+  // Handle event listener for concept card clicks
+  useEffect(() => {
+    const handleAskQuestion = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const message = customEvent.detail?.message;
+      
+      if (message && typeof message === 'string') {
+        // Find the chat input and simulate typing
+        const chatSection = document.getElementById('chat');
+        const chatInterface = chatSection?.querySelector('.glass-card');
+        if (chatInterface) {
+          const inputField = chatInterface.querySelector('input') as HTMLInputElement;
+          const sendButton = chatInterface.querySelector('button[type="submit"]') as HTMLButtonElement;
+          
+          if (inputField && sendButton) {
+            // Focus the input field, set its value, and trigger form submission
+            inputField.focus();
+            inputField.value = message;
+            
+            // Trigger form submission
+            const formSubmitEvent = new Event('submit', { bubbles: true });
+            sendButton.form?.dispatchEvent(formSubmitEvent);
+          }
+        }
+      }
+    };
+    
+    document.addEventListener('askQuestion', handleAskQuestion);
+    
+    return () => {
+      document.removeEventListener('askQuestion', handleAskQuestion);
+    };
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -124,58 +161,50 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ className }) => {
         className="w-full"
       >
         <div className={cn("chat-bubble", bubbleClass, "mb-4")}>
-          {message.content}
+          {isUser ? (
+            <p>{message.content}</p>
+          ) : (
+            <Markdown content={message.content} />
+          )}
         </div>
       </AnimatedTransition>
     );
   };
 
+  const conceptButtonsToShow = isMobile ? 2 : 4;
+  const conceptButtons = [
+    { label: '供需平衡', value: '供需平衡' },
+    { label: '边际效应', value: '边际效应' },
+    { label: '通货膨胀', value: '通货膨胀' },
+    { label: '财政政策', value: '财政政策' },
+  ];
+
   return (
     <div className={cn("flex flex-col h-full rounded-2xl overflow-hidden glass-card", className)}>
-      <div className="px-6 py-4 border-b">
-        <h2 className="text-xl font-semibold">经济学AI助手</h2>
-        <p className="text-sm text-muted-foreground">基于DeepSeek大语言模型</p>
+      <div className="px-4 md:px-6 py-3 md:py-4 border-b">
+        <h2 className="text-lg md:text-xl font-semibold">经济学AI助手</h2>
+        <p className="text-xs md:text-sm text-muted-foreground">基于DeepSeek大语言模型</p>
       </div>
       
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-3 md:p-6 space-y-4">
         {messages.map(renderMessage)}
         <div ref={messagesEndRef} />
       </div>
       
-      <div className="px-6 py-4 border-t">
-        <div className="mb-3 flex flex-wrap gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => handleConceptClick('供需平衡')}
-            disabled={isLoading}
-          >
-            供需平衡
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => handleConceptClick('边际效应')}
-            disabled={isLoading}
-          >
-            边际效应
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => handleConceptClick('通货膨胀')}
-            disabled={isLoading}
-          >
-            通货膨胀
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => handleConceptClick('财政政策')}
-            disabled={isLoading}
-          >
-            财政政策
-          </Button>
+      <div className="px-3 md:px-6 py-3 md:py-4 border-t">
+        <div className="mb-2 md:mb-3 flex flex-wrap gap-2">
+          {conceptButtons.slice(0, conceptButtonsToShow).map((button) => (
+            <Button 
+              key={button.value}
+              variant="outline" 
+              size={isMobile ? "sm" : "default"} 
+              onClick={() => handleConceptClick(button.value)}
+              disabled={isLoading}
+              className="text-xs md:text-sm"
+            >
+              {button.label}
+            </Button>
+          ))}
         </div>
         <form onSubmit={handleSendMessage} className="flex items-center gap-2">
           <Input
@@ -183,9 +212,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ className }) => {
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="输入您的问题..."
             disabled={isLoading}
-            className="flex-1"
+            className="flex-1 text-sm"
           />
-          <Button type="submit" disabled={isLoading || !inputValue.trim()}>
+          <Button type="submit" disabled={isLoading || !inputValue.trim()} size={isMobile ? "sm" : "default"}>
             {isLoading ? (
               <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
