@@ -98,7 +98,7 @@ const VisualizationTool: React.FC<VisualizationToolProps> = ({ className }) => {
         containLabel: true
       },
       xAxis: {
-        type: 'category',
+        type: 'category' as const,
         name: visualization.xAxis.title,
         nameLocation: 'middle',
         nameGap: 30,
@@ -113,7 +113,7 @@ const VisualizationTool: React.FC<VisualizationToolProps> = ({ className }) => {
         }
       },
       yAxis: {
-        type: 'value',
+        type: 'value' as const,
         name: visualization.yAxis.title,
         nameLocation: 'middle',
         nameGap: 40,
@@ -128,19 +128,39 @@ const VisualizationTool: React.FC<VisualizationToolProps> = ({ className }) => {
           }
         }
       },
-      series: visualization.series.map((series, index) => ({
-        name: series.name,
-        type: series.type,
-        data: series.data,
-        smooth: true,
-        lineStyle: {
-          width: 3,
-          color: index === 0 ? '#0077CC' : '#FF6B6B'
-        },
-        itemStyle: {
-          color: index === 0 ? '#0077CC' : '#FF6B6B'
+      series: visualization.series.map((series, index) => {
+        // Map the series type to valid ECharts series type
+        let seriesType: 'line' | 'bar' | 'scatter';
+        switch (series.type) {
+          case 'bar':
+            seriesType = 'bar';
+            break;
+          case 'scatter':
+            seriesType = 'scatter';
+            break;
+          case 'area':
+          case 'line':
+          default:
+            seriesType = 'line';
+            break;
         }
-      }))
+
+        return {
+          name: series.name,
+          type: seriesType,
+          data: series.data,
+          smooth: true,
+          // If it's an area chart, add the areaStyle
+          ...(series.type === 'area' ? { areaStyle: {} } : {}),
+          lineStyle: {
+            width: 3,
+            color: index === 0 ? '#0077CC' : '#FF6B6B'
+          },
+          itemStyle: {
+            color: index === 0 ? '#0077CC' : '#FF6B6B'
+          }
+        };
+      })
     };
   };
 
