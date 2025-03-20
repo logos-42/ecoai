@@ -54,9 +54,9 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
     >
       <div className="container-lg flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {/* New logo based on provided image */}
+          {/* Updated logo path */}
           <div className="w-8 h-8 relative">
-            <img src="/lovable-uploads/d7fd4329-e420-4843-a666-9589c8c43b58.png" alt="经济小白AI" className="w-full h-full object-contain" />
+            <img src="/lovable-uploads/070cc8b2-0cbc-4b3e-ac5f-a5e23c0217a4.png" alt="经济小白AI" className="w-full h-full object-contain" />
           </div>
           <div className="font-semibold text-lg">经济小白AI</div>
         </div>
@@ -92,7 +92,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         </nav>
         
         <div>
-          <Button className="glass-button text-foreground border">
+          <Button className="glass-button text-foreground border" onClick={() => scrollToSection('features')}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2">
               <path d="M8 1V15M1 8H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>

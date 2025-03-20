@@ -73,6 +73,43 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ className }) => {
     }
   };
 
+  const handleConceptClick = async (concept: string) => {
+    if (isLoading) return;
+    
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      content: `什么是${concept}？`,
+      role: 'user',
+      timestamp: new Date(),
+    };
+    
+    setMessages((prev) => [...prev, userMessage]);
+    setIsLoading(true);
+    
+    try {
+      const response = await sendChatMessage(`请简单解释什么是${concept}，并举几个实际例子`);
+      
+      if (response.error) {
+        toast({
+          title: "获取概念解释失败",
+          description: response.error,
+          variant: "destructive",
+        });
+      } else {
+        setMessages((prev) => [...prev, response.data]);
+      }
+    } catch (error) {
+      console.error('Error fetching concept:', error);
+      toast({
+        title: "获取概念解释失败",
+        description: "无法连接到服务器，请稍后再试",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const renderMessage = (message: Message, index: number) => {
     const isUser = message.role === 'user';
     const bubbleClass = isUser ? 'chat-bubble-user' : 'chat-bubble-ai';
@@ -106,6 +143,40 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ className }) => {
       </div>
       
       <div className="px-6 py-4 border-t">
+        <div className="mb-3 flex flex-wrap gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => handleConceptClick('供需平衡')}
+            disabled={isLoading}
+          >
+            供需平衡
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => handleConceptClick('边际效应')}
+            disabled={isLoading}
+          >
+            边际效应
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => handleConceptClick('通货膨胀')}
+            disabled={isLoading}
+          >
+            通货膨胀
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => handleConceptClick('财政政策')}
+            disabled={isLoading}
+          >
+            财政政策
+          </Button>
+        </div>
         <form onSubmit={handleSendMessage} className="flex items-center gap-2">
           <Input
             value={inputValue}

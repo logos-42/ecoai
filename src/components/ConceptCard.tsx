@@ -1,81 +1,64 @@
 
-import React, { useState } from 'react';
-import { EconomicConcept } from '../types';
+import React from 'react';
+import { Card } from '@/components/ui/card';
+import { EconomicConcept } from '@/types';
 import { cn } from '@/lib/utils';
-import AnimatedTransition from './AnimatedTransition';
 
 interface ConceptCardProps {
   concept: EconomicConcept;
   className?: string;
+  onClick?: () => void;
 }
 
-const ConceptCard: React.FC<ConceptCardProps> = ({ concept, className }) => {
-  const [expanded, setExpanded] = useState(false);
-
-  const toggleExpand = () => {
-    setExpanded(!expanded);
+const ConceptCard: React.FC<ConceptCardProps> = ({ concept, className, onClick }) => {
+  // Category badge colors
+  const categoryColors = {
+    basic: 'bg-econoGreen-light text-econoGreen',
+    intermediate: 'bg-econoBlue-light text-econoBlue',
+    advanced: 'bg-econoPurple-light text-econoPurple',
   };
-
-  const getCategoryBadge = () => {
-    switch (concept.category) {
-      case 'basic':
-        return <div className="pill bg-green-100 text-green-800">基础</div>;
-      case 'intermediate':
-        return <div className="pill bg-blue-100 text-blue-800">进阶</div>;
-      case 'advanced':
-        return <div className="pill bg-purple-100 text-purple-800">高级</div>;
-      default:
-        return null;
-    }
+  
+  const categoryName = {
+    basic: '基础',
+    intermediate: '进阶',
+    advanced: '高级',
   };
 
   return (
-    <div 
+    <Card 
       className={cn(
-        'glass-card rounded-2xl overflow-hidden transition-all duration-300',
-        expanded ? 'shadow-elevated' : 'shadow-glass hover:shadow-elevated',
+        "overflow-hidden border shadow-subtle hover:shadow-elevated transition-all duration-300 h-full", 
         className
       )}
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
     >
-      <div 
-        className="p-6 cursor-pointer"
-        onClick={toggleExpand}
-      >
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center">
-            {getCategoryBadge()}
-          </div>
-          <svg 
-            width="20" 
-            height="20" 
-            viewBox="0 0 20 20" 
-            fill="none" 
-            xmlns="http://www.w3.org/2000/svg"
-            className={cn("transition-transform duration-300", expanded ? "rotate-180" : "")}
-          >
-            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+      <div className="p-5 h-full flex flex-col">
+        <div className={cn(
+          "text-xs font-medium rounded-full px-2 py-0.5 inline-flex items-center w-fit mb-3",
+          concept.category in categoryColors ? categoryColors[concept.category as keyof typeof categoryColors] : 'bg-gray-100 text-gray-500'
+        )}>
+          {concept.category in categoryName ? categoryName[concept.category as keyof typeof categoryName] : concept.category}
         </div>
         
-        <h3 className="text-xl font-semibold mb-2">{concept.title}</h3>
-        <p className="text-muted-foreground line-clamp-2">{concept.description}</p>
-      </div>
-      
-      <AnimatedTransition show={expanded} variant="slide-down">
-        <div className="px-6 pb-6 pt-0">
-          <div className="h-px w-full bg-border mb-4" />
-          
-          <div className="space-y-4">
-            <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">实例应用</h4>
-            <ul className="space-y-2 ml-4">
-              {concept.examples.map((example, idx) => (
-                <li key={idx} className="list-disc text-sm text-muted-foreground">{example}</li>
+        <h3 className="text-lg font-semibold mb-2">{concept.title}</h3>
+        <p className="text-muted-foreground text-sm mb-4 flex-1">{concept.description}</p>
+        
+        {concept.examples && concept.examples.length > 0 && (
+          <div className="mt-auto">
+            <div className="text-xs uppercase tracking-wide font-medium text-muted-foreground mb-2">实例应用</div>
+            <ul className="space-y-1">
+              {concept.examples.map((example, i) => (
+                <li key={i} className="text-xs flex items-start gap-2">
+                  <span className="inline-block w-1 h-1 rounded-full bg-primary mt-1.5" />
+                  <span>{example}</span>
+                </li>
               ))}
             </ul>
           </div>
-        </div>
-      </AnimatedTransition>
-    </div>
+        )}
+      </div>
+    </Card>
   );
 };
 

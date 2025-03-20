@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import ChatInterface from '@/components/ChatInterface';
@@ -34,18 +35,23 @@ const sampleConcepts: EconomicConcept[] = [{
   examples: ['企业定价策略中考虑竞争对手反应', '招聘中雇主与求职者的薪资谈判', '国际贸易谈判中各国的关税政策制定'],
   category: 'advanced'
 }];
+
 const Index = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  
   useEffect(() => {
     setIsLoaded(true);
   }, []);
+  
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
     section?.scrollIntoView({
       behavior: 'smooth'
     });
   };
-  return <div className="min-h-screen bg-gradient-to-b from-white to-econoGray-light">
+  
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-white to-econoGray-light">
       <Header />
       
       {/* Hero Section */}
@@ -89,12 +95,14 @@ const Index = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {sampleConcepts.map((concept, index) => <AnimatedTransition key={concept.id} show={isLoaded} variant="scale" delay={index * 100}>
-                <ConceptCard concept={concept} />
-              </AnimatedTransition>)}
+            {sampleConcepts.map((concept, index) => (
+              <AnimatedTransition key={concept.id} show={isLoaded} variant="scale" delay={index * 100}>
+                <ConceptCard concept={concept} onClick={() => scrollToSection('chat')} />
+              </AnimatedTransition>
+            ))}
           </div>
           <div className="mt-12 text-center">
-            <Button className="text-lg py-3 px-6">
+            <Button className="text-lg py-3 px-6" onClick={() => scrollToSection('chat')}>
               浏览更多概念
             </Button>
           </div>
@@ -102,7 +110,7 @@ const Index = () => {
       </section>
       
       {/* Chat Interface Section */}
-      <section className="py-20 bg-econoGray-light">
+      <section id="chat" className="py-20 bg-econoGray-light">
         <div className="container-lg">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -112,17 +120,26 @@ const Index = () => {
                 通过自然语言对话，向AI助手提问任何经济学概念和理论。获得简明易懂、生活化的解释，让复杂理论变得简单。
               </p>
               <ul className="space-y-4">
-                {['通过生活案例解释抽象概念', '提供启发式思考问题深化理解', '根据当前经济热点给出相关分析', '从初级到高级逐步深入学习'].map((item, index) => <li key={index} className="flex items-start gap-3">
+                {['通过生活案例解释抽象概念', '提供启发式思考问题深化理解', '根据当前经济热点给出相关分析', '从初级到高级逐步深入学习'].map((item, index) => (
+                  <li key={index} className="flex items-start gap-3">
                     <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-econoBlue-light flex items-center justify-center">
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10 3L4.5 8.5L2 6" stroke="#0077CC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                     <span>{item}</span>
-                  </li>)}
+                  </li>
+                ))}
               </ul>
               <div className="mt-8">
-                <Button className="text-lg py-3 px-6">
+                <Button className="text-lg py-3 px-6" onClick={() => {
+                  const chatSection = document.getElementById('chat');
+                  const chatInterface = chatSection?.querySelector('.glass-card');
+                  if (chatInterface) {
+                    const inputField = chatInterface.querySelector('input');
+                    inputField?.focus();
+                  }
+                }}>
                   开始对话
                 </Button>
               </div>
@@ -150,17 +167,28 @@ const Index = () => {
                 通过交互式政策模拟器，观察不同经济政策如何影响市场和经济指标。理解货币政策、财政政策和贸易政策的作用机制与效果。
               </p>
               <ul className="space-y-4">
-                {['模拟利率变化对投资与消费的影响', '分析税率调整对企业决策的作用', '观察贸易政策对进出口的短期与长期效应', '基于历史案例提供参考与启示'].map((item, index) => <li key={index} className="flex items-start gap-3">
+                {['模拟利率变化对投资与消费的影响', '分析税率调整对企业决策的作用', '观察贸易政策对进出口的短期与长期效应', '基于历史案例提供参考与启示'].map((item, index) => (
+                  <li key={index} className="flex items-start gap-3">
                     <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-econoBlue-light flex items-center justify-center">
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10 3L4.5 8.5L2 6" stroke="#0077CC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                     <span>{item}</span>
-                  </li>)}
+                  </li>
+                ))}
               </ul>
               <div className="mt-8">
-                <Button className="text-lg py-3 px-6">
+                <Button className="text-lg py-3 px-6" onClick={() => {
+                  const simulatorSection = document.getElementById('simulator');
+                  const simulatorContainer = simulatorSection?.querySelector('.glass-card');
+                  if (simulatorContainer) {
+                    const runButton = simulatorContainer.querySelector('button[class*="w-full"]');
+                    if (runButton) {
+                      runButton.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }
+                }}>
                   尝试模拟器
                 </Button>
               </div>
@@ -180,17 +208,25 @@ const Index = () => {
                 通过交互式图表，直观展现经济数据关系和变化趋势。从供需曲线到宏观经济指标，让复杂数据一目了然。
               </p>
               <ul className="space-y-4">
-                {['动态生成标准经济学图表模型', '调整参数观察曲线变化规律', '展示宏观经济指标历史走势', '提供图表解读与经济含义分析'].map((item, index) => <li key={index} className="flex items-start gap-3">
+                {['动态生成标准经济学图表模型', '调整参数观察曲线变化规律', '展示宏观经济指标历史走势', '提供图表解读与经济含义分析'].map((item, index) => (
+                  <li key={index} className="flex items-start gap-3">
                     <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-econoBlue-light flex items-center justify-center">
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10 3L4.5 8.5L2 6" stroke="#0077CC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                     <span>{item}</span>
-                  </li>)}
+                  </li>
+                ))}
               </ul>
               <div className="mt-8">
-                <Button className="text-lg py-3 px-6">
+                <Button className="text-lg py-3 px-6" onClick={() => {
+                  const vizSection = document.getElementById('visualization');
+                  const vizTool = vizSection?.querySelector('.glass-card');
+                  if (vizTool) {
+                    vizTool.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}>
                   查看可视化工具
                 </Button>
               </div>
@@ -213,10 +249,10 @@ const Index = () => {
               无论您是经济学初学者还是希望深化理解的进阶学习者，经济小白AI都能提供量身定制的学习体验。
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Button className="text-lg py-6 px-8 animated-gradient hover:shadow-elevated transition-all">
+              <Button className="text-lg py-6 px-8 animated-gradient hover:shadow-elevated transition-all" onClick={() => scrollToSection('chat')}>
                 免费开始使用
               </Button>
-              <Button variant="outline" className="text-lg py-6 px-8">
+              <Button variant="outline" className="text-lg py-6 px-8" onClick={() => scrollToSection('features')}>
                 查看教程
               </Button>
             </div>
@@ -230,7 +266,7 @@ const Index = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
               <div className="w-6 h-6 relative">
-                <img src="/lovable-uploads/d7fd4329-e420-4843-a666-9589c8c43b58.png" alt="经济小白AI" className="w-full h-full object-contain" />
+                <img src="/lovable-uploads/070cc8b2-0cbc-4b3e-ac5f-a5e23c0217a4.png" alt="经济小白AI" className="w-full h-full object-contain" />
               </div>
               <div className="font-semibold">经济小白AI</div>
             </div>
@@ -239,11 +275,10 @@ const Index = () => {
               &copy; {new Date().getFullYear()} 经济小白AI. 基于DeepSeek API构建.
             </div>
           </div>
-          <div className="mt-8 text-center text-sm text-muted-foreground">
-            <p>DeepSeek API 密钥: sk-392a95fc7d2445f6b6c79c17725192d1</p>
-          </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
