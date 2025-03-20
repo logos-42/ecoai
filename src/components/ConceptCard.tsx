@@ -27,7 +27,7 @@ const ConceptCard: React.FC<ConceptCardProps> = ({ concept, className, onClick }
   return (
     <Card 
       className={cn(
-        "overflow-hidden border shadow-subtle hover:shadow-elevated transition-all duration-300 h-full", 
+        "overflow-hidden border shadow-subtle hover:shadow-elevated transition-all duration-300 h-full cursor-pointer", 
         className
       )}
       onClick={onClick}

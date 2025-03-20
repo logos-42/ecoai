@@ -8,6 +8,8 @@ import ConceptCard from '@/components/ConceptCard';
 import AnimatedTransition from '@/components/AnimatedTransition';
 import { Button } from '@/components/ui/button';
 import { EconomicConcept } from '@/types';
+import { sendChatMessage } from '@/utils/api';
+import { toast } from '@/components/ui/use-toast';
 
 // Sample economic concepts in Chinese
 const sampleConcepts: EconomicConcept[] = [{
@@ -38,6 +40,7 @@ const sampleConcepts: EconomicConcept[] = [{
 
 const Index = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoadingConcept, setIsLoadingConcept] = useState(false);
   
   useEffect(() => {
     setIsLoaded(true);
@@ -48,6 +51,44 @@ const Index = () => {
     section?.scrollIntoView({
       behavior: 'smooth'
     });
+  };
+  
+  const handleConceptClick = async (concept: EconomicConcept) => {
+    if (isLoadingConcept) return;
+    
+    setIsLoadingConcept(true);
+    
+    // Scroll to chat section
+    const chatSection = document.getElementById('chat');
+    chatSection?.scrollIntoView({ behavior: 'smooth' });
+    
+    // Wait for scroll to complete before focusing chat
+    setTimeout(() => {
+      const chatInterface = chatSection?.querySelector('.glass-card');
+      if (chatInterface) {
+        // Find chat interface and simulate a question about this concept
+        try {
+          // Automatically ask about this concept
+          const message = `请详细解释${concept.title}的概念，并提供几个现实生活中的应用例子。`;
+          
+          // Fire a custom event that ChatInterface can listen for
+          const event = new CustomEvent('askQuestion', { 
+            detail: { message: message }
+          });
+          
+          document.dispatchEvent(event);
+        } catch (error) {
+          console.error('Error handling concept click', error);
+          toast({
+            title: "操作失败",
+            description: "无法处理概念点击，请手动输入问题",
+            variant: "destructive",
+          });
+        } finally {
+          setIsLoadingConcept(false);
+        }
+      }
+    }, 800);
   };
   
   return (
@@ -67,7 +108,7 @@ const Index = () => {
               从基础概念到复杂模型，让经济学学习变得简单易懂。通过交互式工具和生活化案例，轻松理解经济学原理。
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button onClick={() => scrollToSection('features')} className="text-lg py-6 px-8 animated-gradient hover:shadow-elevated transition-all text-[#2a6c7c]">
+              <Button onClick={() => scrollToSection('chat')} className="text-lg py-6 px-8 animated-gradient hover:shadow-elevated transition-all text-[#2a6c7c]">
                 开始学习
               </Button>
               <Button variant="outline" className="text-lg py-6 px-8 bg-white/80 backdrop-blur hover:bg-white transition-all" onClick={() => scrollToSection('simulator')}>
@@ -97,7 +138,10 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {sampleConcepts.map((concept, index) => (
               <AnimatedTransition key={concept.id} show={isLoaded} variant="scale" delay={index * 100}>
-                <ConceptCard concept={concept} onClick={() => scrollToSection('chat')} />
+                <ConceptCard 
+                  concept={concept} 
+                  onClick={() => handleConceptClick(concept)} 
+                />
               </AnimatedTransition>
             ))}
           </div>
@@ -277,6 +321,40 @@ const Index = () => {
           </div>
         </div>
       </footer>
+      
+      {/* Custom event listener for concept card clicks */}
+      <useEffect(() => {
+        const handleAskQuestion = (event: Event) => {
+          const customEvent = event as CustomEvent;
+          const message = customEvent.detail?.message;
+          
+          if (message && typeof message === 'string') {
+            // Find the chat input and simulate typing
+            const chatSection = document.getElementById('chat');
+            const chatInterface = chatSection?.querySelector('.glass-card');
+            if (chatInterface) {
+              const inputField = chatInterface.querySelector('input') as HTMLInputElement;
+              const sendButton = chatInterface.querySelector('button[type="submit"]') as HTMLButtonElement;
+              
+              if (inputField && sendButton) {
+                // Focus the input field, set its value, and trigger form submission
+                inputField.focus();
+                inputField.value = message;
+                
+                // Trigger form submission
+                const formSubmitEvent = new Event('submit', { bubbles: true });
+                sendButton.form?.dispatchEvent(formSubmitEvent);
+              }
+            }
+          }
+        };
+        
+        document.addEventListener('askQuestion', handleAskQuestion);
+        
+        return () => {
+          document.removeEventListener('askQuestion', handleAskQuestion);
+        };
+      }, []);
     </div>
   );
 };

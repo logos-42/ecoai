@@ -13,7 +13,7 @@ export async function sendChatMessage(message: string): Promise<ApiResponse<Mess
   try {
     console.log('Sending message to DeepSeek API:', message);
     
-    // Real implementation using DeepSeek API
+    // Send request to DeepSeek API
     const response = await fetch(`${API_ENDPOINT}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -25,7 +25,7 @@ export async function sendChatMessage(message: string): Promise<ApiResponse<Mess
         messages: [
           {
             role: 'system',
-            content: '你是一个专业的经济学助手，擅长解释经济学概念、分析经济政策影响并提供相关洞见。你的回答应该简洁、清晰，并尽可能提供实际例子来帮助用户理解。'
+            content: '你是一个专业的经济学助手，擅长解释经济学概念、分析经济政策影响并提供相关洞见。你的回答应该简洁、清晰，并尽可能提供实际例子来帮助用户理解。请使用中文回答所有问题。'
           },
           {
             role: 'user',
@@ -40,6 +40,7 @@ export async function sendChatMessage(message: string): Promise<ApiResponse<Mess
     const data = await response.json();
     
     if (!response.ok) {
+      console.error('DeepSeek API error:', data);
       throw new Error(data.error?.message || '请求API时出错');
     }
     
@@ -80,7 +81,7 @@ export async function simulatePolicy(policyType: string, params: Record<string, 
       prompt += `关税率设置为${params.tariffRate}%。`;
     }
     
-    prompt += "请分析该政策的短期、中期和长期经济影响，并提供相关的历史案例。";
+    prompt += "请分析该政策的短期、中期和长期经济影响，并提供相关的历史案例。请使用中文回答并使用清晰的结构。";
     
     // Call DeepSeek API
     const response = await fetch(`${API_ENDPOINT}/chat/completions`, {
@@ -94,7 +95,7 @@ export async function simulatePolicy(policyType: string, params: Record<string, 
         messages: [
           {
             role: 'system',
-            content: '你是一个专业的经济政策分析师，擅长分析各类经济政策的影响。请根据提供的政策参数，分析其短期、中期和长期影响，并提供相关的历史案例。'
+            content: '你是一个专业的经济政策分析师，擅长分析各类经济政策的影响。请根据提供的政策参数，分析其短期、中期和长期影响，并提供相关的历史案例。请使用中文回答，并使用清晰的结构分析影响。'
           },
           {
             role: 'user',
@@ -109,6 +110,7 @@ export async function simulatePolicy(policyType: string, params: Record<string, 
     const data = await response.json();
     
     if (!response.ok) {
+      console.error('DeepSeek API error:', data);
       throw new Error(data.error?.message || '请求API时出错');
     }
     

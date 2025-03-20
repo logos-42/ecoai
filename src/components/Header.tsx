@@ -41,7 +41,21 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
 
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
-    section?.scrollIntoView({ behavior: 'smooth' });
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+      
+      // If navigating to chat section, focus the input field
+      if (sectionId === 'chat') {
+        setTimeout(() => {
+          const chatSection = document.getElementById('chat');
+          const chatInterface = chatSection?.querySelector('.glass-card');
+          if (chatInterface) {
+            const inputField = chatInterface.querySelector('input');
+            inputField?.focus();
+          }
+        }, 800);
+      }
+    }
   };
 
   return (
@@ -92,7 +106,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         </nav>
         
         <div>
-          <Button className="glass-button text-foreground border" onClick={() => scrollToSection('features')}>
+          <Button className="glass-button text-foreground border" onClick={() => scrollToSection('chat')}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2">
               <path d="M8 1V15M1 8H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
