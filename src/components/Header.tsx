@@ -54,11 +54,11 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
     >
       <div className="container-lg flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="32" height="32" rx="8" fill="#0077CC" />
-            <path d="M10 16H22M16 10V22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <div className="font-semibold text-lg">EconomicsGPT</div>
+          {/* New logo based on provided image */}
+          <div className="w-8 h-8 relative">
+            <img src="/lovable-uploads/d7fd4329-e420-4843-a666-9589c8c43b58.png" alt="经济小白AI" className="w-full h-full object-contain" />
+          </div>
+          <div className="font-semibold text-lg">经济小白AI</div>
         </div>
         
         <nav className="hidden md:block">
@@ -83,7 +83,6 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
                     variant="fade"
                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-econoBlue rounded-full"
                   >
-                    {/* Empty div as children */}
                     <div></div>
                   </AnimatedTransition>
                 </button>

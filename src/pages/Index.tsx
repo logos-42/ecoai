@@ -9,7 +9,7 @@ import AnimatedTransition from '@/components/AnimatedTransition';
 import { Button } from '@/components/ui/button';
 import { EconomicConcept } from '@/types';
 
-// Sample economic concepts
+// Sample economic concepts in Chinese
 const sampleConcepts: EconomicConcept[] = [
   {
     id: '1',
@@ -64,6 +64,11 @@ const Index = () => {
     setIsLoaded(true);
   }, []);
 
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    section?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-econoGray-light">
       <Header />
@@ -81,10 +86,17 @@ const Index = () => {
               从基础概念到复杂模型，让经济学学习变得简单易懂。通过交互式工具和生活化案例，轻松理解经济学原理。
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="text-lg py-6 px-8 animated-gradient hover:shadow-elevated transition-all">
+              <Button 
+                className="text-lg py-6 px-8 animated-gradient hover:shadow-elevated transition-all"
+                onClick={() => scrollToSection('features')}
+              >
                 开始学习
               </Button>
-              <Button variant="outline" className="text-lg py-6 px-8 bg-white/80 backdrop-blur hover:bg-white transition-all">
+              <Button 
+                variant="outline" 
+                className="text-lg py-6 px-8 bg-white/80 backdrop-blur hover:bg-white transition-all"
+                onClick={() => scrollToSection('simulator')}
+              >
                 了解更多
               </Button>
             </div>
@@ -120,6 +132,11 @@ const Index = () => {
               </AnimatedTransition>
             ))}
           </div>
+          <div className="mt-12 text-center">
+            <Button className="text-lg py-3 px-6">
+              浏览更多概念
+            </Button>
+          </div>
         </div>
       </section>
       
@@ -150,6 +167,11 @@ const Index = () => {
                   </li>
                 ))}
               </ul>
+              <div className="mt-8">
+                <Button className="text-lg py-3 px-6">
+                  开始对话
+                </Button>
+              </div>
             </div>
             
             <AnimatedTransition show={isLoaded} variant="slide-up" className="w-full h-[500px]">
@@ -190,6 +212,11 @@ const Index = () => {
                   </li>
                 ))}
               </ul>
+              <div className="mt-8">
+                <Button className="text-lg py-3 px-6">
+                  尝试模拟器
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -222,6 +249,11 @@ const Index = () => {
                   </li>
                 ))}
               </ul>
+              <div className="mt-8">
+                <Button className="text-lg py-3 px-6">
+                  查看可视化工具
+                </Button>
+              </div>
             </div>
             
             <AnimatedTransition show={isLoaded} variant="slide-up" className="w-full h-[500px]">
@@ -238,11 +270,16 @@ const Index = () => {
             <div className="inline-block pill mb-4">立即开始</div>
             <h2 className="text-title mb-6">开始您的经济学学习之旅</h2>
             <p className="text-lg text-muted-foreground mb-8">
-              无论您是经济学初学者还是希望深化理解的进阶学习者，EconomicsGPT都能提供量身定制的学习体验。
+              无论您是经济学初学者还是希望深化理解的进阶学习者，经济小白AI都能提供量身定制的学习体验。
             </p>
-            <Button className="text-lg py-6 px-8 animated-gradient hover:shadow-elevated transition-all">
-              免费开始使用
-            </Button>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Button className="text-lg py-6 px-8 animated-gradient hover:shadow-elevated transition-all">
+                免费开始使用
+              </Button>
+              <Button variant="outline" className="text-lg py-6 px-8">
+                查看教程
+              </Button>
+            </div>
           </div>
         </div>
       </section>
@@ -252,16 +289,18 @@ const Index = () => {
         <div className="container-lg">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="32" height="32" rx="8" fill="#0077CC" />
-                <path d="M10 16H22M16 10V22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <div className="font-semibold">EconomicsGPT</div>
+              <div className="w-6 h-6 relative">
+                <img src="/lovable-uploads/d7fd4329-e420-4843-a666-9589c8c43b58.png" alt="经济小白AI" className="w-full h-full object-contain" />
+              </div>
+              <div className="font-semibold">经济小白AI</div>
             </div>
             
             <div className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} EconomicsGPT. 基于DeepSeek API构建.
+              &copy; {new Date().getFullYear()} 经济小白AI. 基于DeepSeek API构建.
             </div>
+          </div>
+          <div className="mt-8 text-center text-sm text-muted-foreground">
+            <p>DeepSeek API 密钥: sk-392a95fc7d2445f6b6c79c17725192d1</p>
           </div>
         </div>
       </footer>

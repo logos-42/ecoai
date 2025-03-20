@@ -44,8 +44,8 @@ export interface VisualizationData {
   series: {
     name: string;
     data: number[];
-    // Define more explicit types for ECharts compatibility
-    type: 'line' | 'bar' | 'scatter' | 'area';
+    // Define valid ECharts series types
+    type: 'line' | 'bar' | 'scatter' | 'pie';
   }[];
 }
 
