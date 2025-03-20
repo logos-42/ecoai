@@ -304,25 +304,7 @@ const Index = () => {
       </section>
       
       {/* CTA Section */}
-      <section className="py-20 bg-white">
-        <div className="container-lg">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-block pill mb-4">立即开始</div>
-            <h2 className="text-title mb-6">开始您的经济学学习之旅</h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              无论您是经济学初学者还是希望深化理解的进阶学习者，经济小白AI都能提供量身定制的学习体验。
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Button onClick={() => scrollToSection('chat')} className="text-lg py-6 px-8 animated-gradient hover:shadow-elevated transition-all text-[#00080a]">
-                免费开始使用
-              </Button>
-              <Button variant="outline" className="text-lg py-6 px-8" onClick={() => scrollToSection('features')}>
-                查看教程
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      
       
       {/* Footer */}
       <footer className="py-12 bg-econoGray-light border-t border-border">
