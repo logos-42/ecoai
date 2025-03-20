@@ -131,18 +131,14 @@ const VisualizationTool: React.FC<VisualizationToolProps> = ({ className }) => {
       series: visualization.series.map((series, index) => {
         // Map the series type to valid ECharts series type
         let seriesType: 'line' | 'bar' | 'scatter';
-        switch (series.type) {
-          case 'bar':
-            seriesType = 'bar';
-            break;
-          case 'scatter':
-            seriesType = 'scatter';
-            break;
-          case 'area':
-          case 'line':
-          default:
-            seriesType = 'line';
-            break;
+        
+        // Convert 'area' type to 'line' with areaStyle
+        if (series.type === 'area') {
+          seriesType = 'line';
+        } else if (series.type === 'bar' || series.type === 'scatter') {
+          seriesType = series.type;
+        } else {
+          seriesType = 'line';
         }
 
         return {
@@ -150,7 +146,7 @@ const VisualizationTool: React.FC<VisualizationToolProps> = ({ className }) => {
           type: seriesType,
           data: series.data,
           smooth: true,
-          // If it's an area chart, add the areaStyle
+          // Add areaStyle for 'area' type
           ...(series.type === 'area' ? { areaStyle: {} } : {}),
           lineStyle: {
             width: 3,
