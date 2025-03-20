@@ -1,25 +1,22 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import AnimatedTransition from './AnimatedTransition';
-
 interface HeaderProps {
   className?: string;
 }
-
-const Header: React.FC<HeaderProps> = ({ className }) => {
+const Header: React.FC<HeaderProps> = ({
+  className
+}) => {
   const [scrolled, setScrolled] = useState(false);
   const [currentSection, setCurrentSection] = useState('home');
-
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       setScrolled(scrollPosition > 10);
-      
+
       // Simple section detection
       const sections = ['home', 'features', 'simulator', 'visualization'];
-      
       for (const section of sections) {
         const element = document.getElementById(section);
         if (element) {
@@ -31,19 +28,18 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         }
       }
     };
-    
     window.addEventListener('scroll', handleScroll);
-    
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
     if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
-      
+      section.scrollIntoView({
+        behavior: 'smooth'
+      });
+
       // If navigating to chat section, focus the input field
       if (sectionId === 'chat') {
         setTimeout(() => {
@@ -57,51 +53,38 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       }
     }
   };
-
-  return (
-    <header 
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4",
-        scrolled ? "bg-white/80 backdrop-blur shadow-subtle" : "bg-transparent",
-        className
-      )}
-    >
+  return <header className={cn("fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4", scrolled ? "bg-white/80 backdrop-blur shadow-subtle" : "bg-transparent", className)}>
       <div className="container-lg flex items-center justify-between">
         <div className="flex items-center gap-2">
           {/* Updated logo path */}
           <div className="w-8 h-8 relative">
-            <img src="/lovable-uploads/070cc8b2-0cbc-4b3e-ac5f-a5e23c0217a4.png" alt="经济小白AI" className="w-full h-full object-contain" />
+            <img alt="经济小白AI" src="/lovable-uploads/ba42c879-b699-40e5-b65e-8f918f29f387.png" className="w-full h-full object-cover" />
           </div>
           <div className="font-semibold text-lg">经济小白AI</div>
         </div>
         
         <nav className="hidden md:block">
           <ul className="flex items-center gap-6">
-            {[
-              { id: 'home', label: '首页' },
-              { id: 'features', label: '功能' },
-              { id: 'simulator', label: '政策模拟' },
-              { id: 'visualization', label: '数据图表' },
-            ].map((item) => (
-              <li key={item.id}>
-                <button
-                  onClick={() => scrollToSection(item.id)}
-                  className={cn(
-                    "relative px-1 py-2 font-medium text-sm transition-colors",
-                    currentSection === item.id ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
+            {[{
+            id: 'home',
+            label: '首页'
+          }, {
+            id: 'features',
+            label: '功能'
+          }, {
+            id: 'simulator',
+            label: '政策模拟'
+          }, {
+            id: 'visualization',
+            label: '数据图表'
+          }].map(item => <li key={item.id}>
+                <button onClick={() => scrollToSection(item.id)} className={cn("relative px-1 py-2 font-medium text-sm transition-colors", currentSection === item.id ? "text-foreground" : "text-muted-foreground hover:text-foreground")}>
                   {item.label}
-                  <AnimatedTransition 
-                    show={currentSection === item.id} 
-                    variant="fade"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-econoBlue rounded-full"
-                  >
+                  <AnimatedTransition show={currentSection === item.id} variant="fade" className="absolute bottom-0 left-0 right-0 h-0.5 bg-econoBlue rounded-full">
                     <div></div>
                   </AnimatedTransition>
                 </button>
-              </li>
-            ))}
+              </li>)}
           </ul>
         </nav>
         
@@ -114,8 +97,6 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           </Button>
         </div>
       </div>
-    </header>
-  );
+    </header>;
 };
-
 export default Header;
