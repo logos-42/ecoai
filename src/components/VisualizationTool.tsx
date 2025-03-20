@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { generateVisualization } from '../utils/api';
 import AnimatedTransition from './AnimatedTransition';
 import { toast } from '@/components/ui/use-toast';
+import type { EChartsOption } from 'echarts';
 
 // We'll use a dynamic import for Charts to avoid SSR issues
 const EChartsReact = React.lazy(() => import('echarts-for-react'));
@@ -59,7 +60,7 @@ const VisualizationTool: React.FC<VisualizationToolProps> = ({ className }) => {
     }
   };
 
-  const getChartOptions = () => {
+  const getChartOptions = (): EChartsOption => {
     if (!visualization) return {};
     
     return {

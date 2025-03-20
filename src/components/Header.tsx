@@ -82,7 +82,10 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
                     show={currentSection === item.id} 
                     variant="fade"
                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-econoBlue rounded-full"
-                  />
+                  >
+                    {/* Empty div as children */}
+                    <div></div>
+                  </AnimatedTransition>
                 </button>
               </li>
             ))}
