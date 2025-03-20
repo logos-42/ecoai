@@ -312,7 +312,7 @@ const Index = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
               <div className="w-6 h-6 relative">
-                <img src="/lovable-uploads/070cc8b2-0cbc-4b3e-ac5f-a5e23c0217a4.png" alt="经济小白AI" className="w-full h-full object-contain" />
+                <img alt="经济小白AI" className="w-full h-full object-cover" src="/lovable-uploads/18b0d26e-5489-46c4-a666-a1d2ebfdcbfe.png" />
               </div>
               <div className="font-semibold">经济小白AI</div>
             </div>
