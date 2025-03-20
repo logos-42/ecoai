@@ -46,6 +46,40 @@ const Index = () => {
     setIsLoaded(true);
   }, []);
   
+  // Event listener for concept card clicks - moved to top level
+  useEffect(() => {
+    const handleAskQuestion = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const message = customEvent.detail?.message;
+      
+      if (message && typeof message === 'string') {
+        // Find the chat input and simulate typing
+        const chatSection = document.getElementById('chat');
+        const chatInterface = chatSection?.querySelector('.glass-card');
+        if (chatInterface) {
+          const inputField = chatInterface.querySelector('input') as HTMLInputElement;
+          const sendButton = chatInterface.querySelector('button[type="submit"]') as HTMLButtonElement;
+          
+          if (inputField && sendButton) {
+            // Focus the input field, set its value, and trigger form submission
+            inputField.focus();
+            inputField.value = message;
+            
+            // Trigger form submission
+            const formSubmitEvent = new Event('submit', { bubbles: true });
+            sendButton.form?.dispatchEvent(formSubmitEvent);
+          }
+        }
+      }
+    };
+    
+    document.addEventListener('askQuestion', handleAskQuestion);
+    
+    return () => {
+      document.removeEventListener('askQuestion', handleAskQuestion);
+    };
+  }, []);
+  
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
     section?.scrollIntoView({
@@ -321,40 +355,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-      
-      {/* Custom event listener for concept card clicks */}
-      <useEffect(() => {
-        const handleAskQuestion = (event: Event) => {
-          const customEvent = event as CustomEvent;
-          const message = customEvent.detail?.message;
-          
-          if (message && typeof message === 'string') {
-            // Find the chat input and simulate typing
-            const chatSection = document.getElementById('chat');
-            const chatInterface = chatSection?.querySelector('.glass-card');
-            if (chatInterface) {
-              const inputField = chatInterface.querySelector('input') as HTMLInputElement;
-              const sendButton = chatInterface.querySelector('button[type="submit"]') as HTMLButtonElement;
-              
-              if (inputField && sendButton) {
-                // Focus the input field, set its value, and trigger form submission
-                inputField.focus();
-                inputField.value = message;
-                
-                // Trigger form submission
-                const formSubmitEvent = new Event('submit', { bubbles: true });
-                sendButton.form?.dispatchEvent(formSubmitEvent);
-              }
-            }
-          }
-        };
-        
-        document.addEventListener('askQuestion', handleAskQuestion);
-        
-        return () => {
-          document.removeEventListener('askQuestion', handleAskQuestion);
-        };
-      }, []);
     </div>
   );
 };
